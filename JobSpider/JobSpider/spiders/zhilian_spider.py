@@ -57,7 +57,6 @@ class ZhilianSpider(RedisSpider):
     redis_key = 'job_spider_start_urls_zl'
 
     def parse(self, response):
-        print(self.start_urls)
         # 获取下一页的url
         next_url = get_first_element(response.xpath(".//span[@class='font12 pageNext']/parent::*/@href").extract())
         # 获取详情页的url

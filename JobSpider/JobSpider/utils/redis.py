@@ -1,10 +1,10 @@
 # coding=utf-8
 
 from __future__ import absolute_import
-
+import datetime
 import pickle
 import time
-
+import logging
 from scrapy.utils.project import get_project_settings
 from redis import StrictRedis, ConnectionPool, Connection
 
@@ -66,11 +66,30 @@ def load_obj_in_redis_no_ts(key):
 
 
 def insert_into_job_spider(value, types):
+    today = datetime.datetime.now()
     redis_client = get_redis_client()
+    # zhilian
     if types == 1:
         redis_client.lpush('job_spider_start_urls_zl', value)
-        print '======[Zhiian][success] Insert' + value + 'into the redis queue[job_spider_start_urls_zl]======'
+        logging.info('======[Zhiian][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_urls_zl]======')
 
     if types == 2:
         redis_client.lpush('job_spider_request_zl', value)
-        print '======[Zhiian][success] Insert' + value + 'into the redis queue[job_spider_start_request_zl]======'
+        logging.info('======[Zhiian][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_request_zl]======')
+
+    # wuyou
+    if types == 3:
+        redis_client.lpush('job_spider_start_urls_wy', value)
+        logging.info('======[Wuyou][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_urls_wy]======')
+
+    if types == 4:
+        redis_client.lpush('job_spider_request_wy', value)
+        logging.info('======[Wuyou][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_request_wy]======')

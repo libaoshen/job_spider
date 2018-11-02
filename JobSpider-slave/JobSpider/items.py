@@ -20,9 +20,6 @@ class Item(scrapy.Item):
     source = scrapy.Field()
     # 职位来源Url
     source_url = scrapy.Field()
-
-
-class ZhilianSpiderItem(Item):
     job_name = scrapy.Field()  # 职位名
     company_name = scrapy.Field()  # 公司名
     company_domain = scrapy.Field()  # 公司领域
@@ -35,3 +32,14 @@ class ZhilianSpiderItem(Item):
     job_attribute = scrapy.Field()  # 职位性质:全职，实习，兼职
     job_education = scrapy.Field()  # 学历要求
     job_description = scrapy.Field()  # 职位描述
+    job_salary = scrapy.Field()  # 工资
+    gather_time = scrapy.Field()  # 采集时间
+
+
+class ZhilianSpiderItem(Item):
+    pass
+
+
+class WuyouSpiderItem(Item):
+    job_bright = scrapy.Field()  # 职位亮点
+    job_info = scrapy.Field()  # 笼统的职位信息

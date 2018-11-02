@@ -106,7 +106,7 @@ REDIS_PARAMS = {
 }
 
 # 配置日志:按天生成日志信息
-today = datetime.datetime.now()
-log_file_path = "log/scrapy_{}_{}_{}.log".format(today.year, today.month, today.day)
-LOG_LEVEL="INFO"
-LOG_FILE=log_file_path
+# today = datetime.datetime.now()
+# log_file_path = "log/scrapy_{}_{}_{}.log".format(today.year, today.month, today.day)
+# LOG_LEVEL="INFO"
+# LOG_FILE=log_file_path
