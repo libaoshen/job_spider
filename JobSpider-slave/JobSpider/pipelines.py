@@ -16,7 +16,7 @@ class JobspiderPipeline(object):
     def process_item(self, item, spider):
         if item['job_name']:
             line = json.dumps(dict(item)) + "\n"
-            self.file.write(line)
+            self.file.write(line.decode('unicode_escape'))
             return item
         else:
             raise DropItem("Missing job_name in %s" % item)

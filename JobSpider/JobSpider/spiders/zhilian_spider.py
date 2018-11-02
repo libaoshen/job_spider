@@ -3,7 +3,10 @@
 import sys
 import scrapy
 from scrapy.http.request import Request
-from JobSpider.utils.common import A
+from JobSpider.utils.common import get_first_element
+from JobSpider.utils.redis import insert_into_job_spider
+from scrapy_redis.spiders import RedisSpider
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 
@@ -46,84 +49,24 @@ job_type_list_other = ["实习生", "管培生", "储备干部", "公务员", "�
 
 job_type_list = job_type_list_producet_tech + job_type_list_adm + job_type_list_archi + job_type_list_eco + job_type_list_manufa + job_type_list_market + job_type_list_other
 
-headers = {"Host": "cimg.zhaopin.cn",
-           "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0",
-           "Referer": "https://xiaoyuan.zhaopin.com/full/0/0_0_0_0_0_-1_%E9%93%B6%E8%A1%8C%E6%9F%9C%E5%91%98_1_0"}
 
-
-class ZhilianSpiderItem(scrapy.Item):
-    job_name = scrapy.Field()  # 职位名
-    company_name = scrapy.Field()  # 公司名
-    company_domain = scrapy.Field()  # 公司领域
-    company_scale = scrapy.Field()  # 公司规模
-    company_type = scrapy.Field()  # 公司类型
-    job_location = scrapy.Field()  # 工作地点
-    job_type = scrapy.Field()  # 职位类别
-    job_hc = scrapy.Field()  # 招聘人数
-    job_pub_time = scrapy.Field()  # 发布时间
-    job_attribute = scrapy.Field()  # 职位性质:全职，实习，兼职
-    job_education = scrapy.Field()  # 学历要求
-    job_description = scrapy.Field()  # 职位描述
-
-
-class ZhilianSpider(scrapy.Spider):
+class ZhilianSpider(RedisSpider):
     name = "zhilian"  # 爬虫名称
     allowed_domains = ["xiaoyuan.zhaopin.com"]  # 允许的域名
-    start_urls = ["https://xiaoyuan.zhaopin.com/full/0/0_0_0_0_0_-1_银行柜员_1_0"]
-
-    # ["https://xiaoyuan.zhaopin.com/full/0/0_0_0_0_0_-1_" + type + "_1_0" for type in job_type_list]
+    start_urls = ["https://xiaoyuan.zhaopin.com/full/0/0_0_0_0_0_-1_" + job_type + "_1_0" for job_type in job_type_list]
+    redis_key = 'job_spider_start_urls_zl'
 
     def parse(self, response):
-        # urls = response.xpath(
-        #     "//a[@class='searchResultSeemore __ga__fullResultcampuspostmore_clickfullresultcampuspostmore_001']@href")\
-        #     .extract()
+        print(self.start_urls)
+        # 获取下一页的url
+        next_url = get_first_element(response.xpath(".//span[@class='font12 pageNext']/parent::*/@href").extract())
+        # 获取详情页的url
+        details_urls = response.xpath("//div[@class='searchResultJobinfo fr']/p[1]/a/@href").extract()
 
-        urls = response.xpath("//div[@class='searchResultJobinfo fr']/p[1]/a/@href").extract()
-
-        for url in urls:
-            yield Request(url="https:" + url, callback=self.parse_job)
-
-    def parse_job(self, response):
-        job_name = response.xpath(".//h1[@id='JobName']/text()").extract()[0] if response.xpath(".//h1[@id='JobName']/text()").extract() else None
-        company_name = response.xpath(".//li[@id='jobCompany']/a/text()").extract()[0] if response.xpath(".//li[@id='jobCompany']/a/text()").extract() else None
-        company_info = response.xpath(".//li[@class='cJobDetailInforWd2']")
-        company_domain = company_info[0].xpath("@title").extract()[0] if len(company_info) > 1 else None
-        company_scale = company_info[1].xpath("text()").extract()[0] if len(company_info) > 1 else None
-
-        company_type = response.xpath(".//ul[@class='cJobDetailInforTopWrap clearfix c3']/li[last()]/text()").extract()[
-            0] if response.xpath(".//ul[@class='cJobDetailInforTopWrap clearfix c3']/li[last()]/text()").extract() else None
-        job_info = response.xpath(
-            ".//ul[@class='cJobDetailInforBotWrap clearfix c3']/li[@class='cJobDetailInforWd2 marb']")
-        job_info_len = len(job_info)
-        job_location = job_info[0].xpath("text()").extract()[0] if job_info_len > 0 else None
-        job_type = job_info[1].xpath("text()").extract()[0] if job_info_len > 1 else None
-        job_hc = job_info[2].xpath("text()").extract()[0] if job_info_len > 2 else None
-        job_pub_time = job_info[3].xpath("text()").extract()[0] if job_info_len > 3 else None
-        job_attribute = job_info[4].xpath("text()").extract()[0] if job_info_len > 4 else None
-        job_education = job_info[5].xpath("text()").extract()[0] if job_info_len > 5 else None
-
-        job_description = response.xpath(".//div[@class='cJob_Detail f14']/p[@class='mt20']/text()").extract()[0] \
-            if response.xpath(".//div[@class='cJob_Detail f14']/p[@class='mt20']/text()").extract() else \
-            response.xpath(".//div[@class='cJob_Detail f14']/p[2]/span/text()").extract()[0] \
-                if response.xpath(".//div[@class='cJob_Detail f14']/p[2]/span/text()").extract() else None
-
-        # print("job_name " + job_name)
-        # print("job_company " + job_company)
-        # print("job_hangye " + job_hangye)
-        # print("job_scale " + job_scale)
-        # print("company_type " + company_type)
-        # print("job_location " + job_location)
-        # print("job_type " + job_type)
-        # print("job_numbers " + job_numbers)
-        # print("job_pub_time " + job_pub_time)
-        # print("job_attribute " + job_attribute)
-        # print("job_education " + job_education)
-        # print("job_description " + job_description)
-
-        item = ZhilianSpiderItem(job_name=job_name, company_name=company_name, company_domain=company_domain,
-                                 company_scale=company_scale, company_type=company_type, job_location=job_location,
-                                 job_type=job_type, job_hc=job_hc, job_pub_time=job_pub_time,
-                                 job_attribute=job_attribute, job_education=job_education,
-                                 job_description=job_description)
-
-        yield item
+        # 下一页插入到redis的start_url list中
+        if next_url:
+            if details_urls:
+                insert_into_job_spider("https://" + self.allowed_domains[0] + next_url, 1)
+        # 详情页插入到redis的request list中
+        for url in details_urls:
+            insert_into_job_spider(url if url.startswith('http') else "https:" + url, 2)
