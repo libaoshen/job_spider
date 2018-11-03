@@ -16,7 +16,7 @@ class JobspiderItem(scrapy.Item):
 
 class Item(scrapy.Item):
     # 职位信息来源
-    # # 1 - 智联； 2 - 前程无忧；3 - 中华英才网；4 - 大街网； 5- 拉勾网； 6- 猎聘网
+    # # 1 - 智联； 2 - 前程无忧；3 - 中华英才网；4 - 猎聘网
     source = scrapy.Field()
     # 职位来源Url
     source_url = scrapy.Field()
@@ -43,3 +43,11 @@ class ZhilianSpiderItem(Item):
 class WuyouSpiderItem(Item):
     job_bright = scrapy.Field()  # 职位亮点
     job_info = scrapy.Field()  # 笼统的职位信息
+
+
+class LiepinSpiderItem(Item):
+    job_dead_time = scrapy.Field()  # 职位截至时间
+
+
+class ChinahrSpiderItem(Item):
+    job_is_dead = scrapy.Field()  # 职位截至时间

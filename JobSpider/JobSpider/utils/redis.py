@@ -93,3 +93,29 @@ def insert_into_job_spider(value, types):
         logging.info('======[Wuyou][success][{}-{}-{} {}:{}:{}] Insert '
                      .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
                      value + ' into the redis queue[job_spider_start_request_wy]======')
+
+    # liepin
+    if types == 5:
+        redis_client.lpush('job_spider_start_urls_lp', value)
+        logging.info('======[Liepin][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_urls_lp]======')
+
+    if types == 6:
+        redis_client.lpush('job_spider_request_lp', value)
+        logging.info('======[Liepin][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_request_lp]======')
+
+    # liepin
+    if types == 7:
+        redis_client.lpush('job_spider_start_urls_ch', value)
+        logging.info('======[Chinahr][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_urls_ch]======')
+
+    if types == 8:
+        redis_client.lpush('job_spider_request_ch', value)
+        logging.info('======[Chinahr][success][{}-{}-{} {}:{}:{}] Insert '
+                     .format(today.year, today.month, today.day, today.hour, today.minute, today.second) +
+                     value + ' into the redis queue[job_spider_start_request_ch]======')
